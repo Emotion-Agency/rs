@@ -24,9 +24,9 @@
     <span class="theme-btn__text theme-btn__text--lighten">lighten</span>
   </button>
   <!-- BEGIN scripts -->
-    <script src="./js/runtime-app.js"></script> 
-    <script src="./js/vendors~app.chunk.js"></script> 
-    <script src="./js/app.chunk.js"></script>
-    <!-- END scripts -->
+  {% for script in scripts %}
+    <script src="./js/{{ script }}"></script>
+  {% endfor %}
+  <!-- END scripts -->
 </body>
 </html>

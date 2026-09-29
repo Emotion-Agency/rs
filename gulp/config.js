@@ -1,11 +1,13 @@
-const util = require('gulp-util')
+const log = require('fancy-log')
+const colors = require('ansi-colors')
 const foldersName = require('./foldersName')
 
 const projectFolder = foldersName.projectFolder
 const sourceFolder = foldersName.sourceFolder
 const staticFolder = foldersName.staticFolder
 
-const production = util.env.production || util.env.prod || false
+const production =
+  process.argv.includes('--production') || process.argv.includes('--prod')
 
 const config = {
   env: 'development',
@@ -23,6 +25,8 @@ const config = {
     audio: projectFolder + '/audio/',
     fonts: projectFolder + '/fonts/',
   },
+  // Script files of the webpack entry, written by webpack and read by the html task
+  entrypoints: '.tmp/entrypoints.json',
   src: {
     templates: 'src/templates',
     html: [
@@ -30,7 +34,7 @@ const config = {
       '!' + sourceFolder + '/_*.html',
       '!' + sourceFolder + '/data/data.html',
     ],
-    static: [staticFolder + '/**/*', '!' + staticFolder + '/sw.js'],
+    static: staticFolder + '/**/*',
     php: projectFolder + '/**/*.php',
     css: sourceFolder + '/scss/app.scss',
     js: sourceFolder + '/js/app.js',
@@ -59,10 +63,7 @@ const config = {
   },
 
   logEnv: function () {
-    util.log(
-      'Environment:',
-      util.colors.white.bgMagenta(' ' + process.env.NODE_ENV + ' ')
-    )
+    log('Environment:', colors.white.bgMagenta(' ' + process.env.NODE_ENV + ' '))
   },
 
   // errorHandler: require('./util/handle-errors')

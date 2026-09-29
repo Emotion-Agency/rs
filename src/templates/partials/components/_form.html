@@ -1,11 +1,11 @@
 <div class="form-wrapper custom">
   <button class="form-wrapper__close-btn">Close</button>
   <div class="container form-wrapper__container">
-    <form data-error="Sorry, an error has occurred:(" novalidate class="form cols">
+    <!-- Formspree endpoint: replace YOUR_FORM_ID with the id from formspree.io -->
+    <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" data-error="Sorry, an error has occurred:(" novalidate class="form cols">
       <!-- Hidden Required Fields -->
-      <input type="hidden" name="project_name" value="Roman Stets">
-      <input type="hidden" name="admin_email" value="hello@emotion-agency.com">
-      <input type="hidden" name="form_subject" value="Заявка с сайта">
+      <input type="hidden" name="_subject" value="Заявка с сайта">
+      <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
       <!-- END Hidden Required Fields -->
       <span class="form__label cols__col cols__col-s-3 js-form-item">Hello,</span>
       <div class="form__input-wrapper cols__col">

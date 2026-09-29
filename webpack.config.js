@@ -1,9 +1,24 @@
-const webpack = require('webpack')
+const fs = require('fs')
 const path = require('path')
-const EntrypointsPlugin = require('emotion-webpack-entrypoints-plugin')
-const WorkboxWebpackPlugin = require('workbox-webpack-plugin')
+const gulpConfig = require('./gulp/config')
 // const BundleAnalyzerPlugin =
 // require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+
+// Saves the script files of the app entry, the html task renders them
+// as <script> tags into the layout
+class EntrypointsPlugin {
+  apply(compiler) {
+    compiler.hooks.afterEmit.tap('EntrypointsPlugin', compilation => {
+      const files = compilation.entrypoints
+        .get('app')
+        .getFiles()
+        .filter(file => file.endsWith('.js'))
+      const file = path.resolve(__dirname, gulpConfig.entrypoints)
+      fs.mkdirSync(path.dirname(file), {recursive: true})
+      fs.writeFileSync(file, JSON.stringify(files))
+    })
+  }
+}
 
 function createConfig(env) {
   const isProduction = env === 'production'
@@ -39,42 +54,31 @@ function createConfig(env) {
     module: {
       rules: [
         {
-          enforce: 'pre',
-          test: /\.js$/,
-          exclude: '/node_modules/',
-          loader: 'eslint-loader',
-          options: {
-            fix: true,
-            cache: true,
-            ignorePattern: __dirname + '/src/js/lib/',
-            formatter: require.resolve('eslint-formatter-pretty'),
-          },
-        },
-        {
           test: /\.js$/,
           loader: 'babel-loader',
-          exclude: '/node_modules/',
+          exclude: /node_modules/,
           options: {
             cacheDirectory: true,
           },
         },
         {
           test: /\.glsl$/,
-          exclude: '/node_modules/',
+          exclude: /node_modules/,
           loader: 'webpack-glsl-loader',
         },
       ],
     },
-    mode: isProduction ? 'development' : 'production',
+    mode: isProduction ? 'production' : 'development',
     devtool: !isProduction ? 'eval-cheap-module-source-map' : false,
     performance: {
-      hints: process.env.NODE_ENV === 'production' ? 'warning' : false,
+      hints: isProduction ? 'warning' : false,
     },
     optimization: {
       runtimeChunk: {
         name: entrypoint => `runtime-${entrypoint.name}`,
       },
       minimize: isProduction,
+      emitOnErrors: false,
       splitChunks: {
         // include all types of chunks
         chunks: 'all',
@@ -89,20 +93,7 @@ function createConfig(env) {
         // }
       },
     },
-    plugins: [
-      new webpack.NoEmitOnErrorsPlugin(),
-      new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-      }),
-      new EntrypointsPlugin({
-        dir: path.resolve(__dirname, 'src/templates/layouts'),
-      }),
-      isProduction &&
-        new WorkboxWebpackPlugin.InjectManifest({
-          swSrc: './static/sw.js',
-          swDest: '../sw.js',
-        }),
-    ].filter(Boolean),
+    plugins: [new EntrypointsPlugin()],
   }
 
   // if (isProduction) {

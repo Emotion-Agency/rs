@@ -1,5 +1,4 @@
 import FormInputs from './FormInputs.js'
-import serialize from './formSend.js'
 import {animation} from './animation.js'
 
 export default class FormSubmit extends FormInputs {
@@ -24,28 +23,26 @@ export default class FormSubmit extends FormInputs {
     animation(this.form)
   }
 
+  // Sends the form to Formspree (endpoint is the form's action attribute)
   async requestSend() {
-    const URL = 'https://rstets.emotion-agency.com/'
-    const mURL = URL + 'mail.php'
-
     try {
-      const res = await fetch(mURL, {
+      const res = await fetch(this.form.action, {
         method: 'POST',
-        body: serialize(this.form),
+        body: new FormData(this.form),
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          Accept: 'application/json',
         },
       })
 
-      if (res.status >= 200 && res.status < 400) {
+      if (res.ok) {
         this.requestLoad()
         return
-      } else {
-        alert(this.form.getAttribute('data-error'))
       }
+      console.log(await res.text())
     } catch (e) {
       console.log(e)
     }
+    alert(this.form.getAttribute('data-error'))
   }
 
   submit(e) {
