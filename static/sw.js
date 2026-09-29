@@ -1,45 +1,16 @@
-if (workbox) {
-  console.log('Yay! Workbox is loaded !')
-  workbox.precaching.precacheAndRoute([])
+// Kill switch for the service worker that earlier versions of the site
+// registered: browsers that still have it installed pick this file up on
+// their next update check, drop all caches, unregister and reload open tabs.
+self.addEventListener('install', () => self.skipWaiting())
 
-  self.addEventListener('fetch', event => {
-    event.respondWith(
-      caches
-        .match(event.request)
-        .then(response => response || fetch(event.request))
-        .catch(() => caches.match('/'))
-    )
-  })
-
-  workbox.routing.registerRoute(
-    /(.*)others(.*)\.(?:png|gif|jpg|webp|jpeg)/,
-    new workbox.strategies.CacheFirst({
-      cacheName: 'images',
-      plugins: [
-        new workbox.expiration.Plugin({
-          maxEntries: 50,
-          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
-        }),
-      ],
-    })
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    (async () => {
+      const keys = await caches.keys()
+      await Promise.all(keys.map(key => caches.delete(key)))
+      await self.registration.unregister()
+      const clients = await self.clients.matchAll({type: 'window'})
+      clients.forEach(client => client.navigate(client.url))
+    })()
   )
-
-  workbox.routing.registerRoute(
-    /.*\.(?:css)/,
-    new workbox.strategies.StaleWhileRevalidate({
-      cacheName: 'assets',
-    })
-  )
-  workbox.googleAnalytics.initialize()
-
-  self.addEventListener('message', event => {
-    if (event.data && event.data.type === 'SKIP_WAITING') {
-      self.skipWaiting()
-    }
-  })
-
-  workbox.core.clientsClaim()
-  workbox.precaching.precacheAndRoute(self.__precacheManifest)
-} else {
-  console.log("Oops! Workbox didn't load")
-}
+})

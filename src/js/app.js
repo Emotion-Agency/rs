@@ -10,7 +10,7 @@ import moveEl from './libs/moveEl'
 import cssWebP from './libs/testWebP'
 
 import Button from './components/Button'
-import Theme from './components/Theme'
+import Theme from './components/theme'
 import Nav from './components/Nav'
 import FormPopUp from './components/FormPopUp'
 import Loader from './components/Loader'
@@ -25,7 +25,7 @@ import bgWebP from './utils/bgWebP'
 
 import FormSubmit from './form/FormSubmit'
 import {setState, state} from './state'
-import * as serviceWorker from './serviceworker'
+import * as serviceWorker from './serviceWorker'
 
 process.env.NODE_ENV === 'production' && cssWebP()
 
@@ -119,4 +119,4 @@ hooks.useBoth(() => {
   })
 })
 
-process.env.NODE_ENV === 'production' && serviceWorker.register()
+serviceWorker.unregister()

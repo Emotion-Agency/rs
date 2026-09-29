@@ -1,3 +1,4 @@
+const fs = require('fs')
 const config = require('../config')
 const nunjucksRender = require('gulp-nunjucks-render')
 const prettify = require('gulp-prettify')
@@ -10,6 +11,7 @@ const inject = require('gulp-inject-string')
 function html(bs) {
 
   const replaceCss = 'app.' + config.hash + '.css'
+  const scripts = JSON.parse(fs.readFileSync(config.entrypoints, 'utf8'))
 
   nunjucksRender.nunjucks.configure({
     watch: false,
@@ -19,7 +21,8 @@ function html(bs) {
 
   return src([config.src.templates + '/**/[^_]*.html'])
     .pipe(nunjucksRender({
-      path: ['src/templates/'] // String or Array
+      path: ['src/templates/'], // String or Array
+      data: {scripts}
     }))
     .pipe(frontMatter({property: 'data'}))
     .pipe(nunjucksRender({

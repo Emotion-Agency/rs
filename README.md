@@ -1,8 +1,10 @@
-#How to use
+# How to use
+
+Requires Node.js 24 (see `.nvmrc`, run `nvm use`).
 
 Clone this repo and then in command line type:
 
-* `npm install` or `yarn` - install all dependencies
+* `npm install` - install all dependencies
 * `gulp` - run dev-server and let magic happen, or
 * `gulp build` - build project from sources
 * `gulp clean` - clean build folder
@@ -26,9 +28,21 @@ Task name          | Description
 You can also use [npm scripts](https://docs.npmjs.com/misc/scripts):
 
 * `npm run start` - same as `gulp default`.
-* `npm run build` - same as `gulp build`.
-* `npm run ghpages` to push only `./build` folder to **gh-pages** branch on github (very useful for previews).
+* `npm run build` - same as `gulp build --production`, output goes to `./build`.
 * `npm run lint` - linting javascript with **eslint**.
 * `npm run lint-fix` - fix as many issues as possible relatives to **eslint** settings.
 
+## Deploy
 
+The site is deployed to [Vercel](https://vercel.com) as a static site, settings are in `vercel.json`
+(build command `npm run build`, output directory `build`, clean URLs without `.html`).
+
+To preview the production build locally:
+
+* `npm run build && npx serve build`
+
+## Contact form
+
+The form is sent to [Formspree](https://formspree.io). The endpoint is the `action` attribute of the form
+in `src/templates/partials/components/_form.html`, replace `YOUR_FORM_ID` with the id of your Formspree form.
+The recipient email is set in the Formspree form settings.

@@ -1,19 +1,21 @@
-export const register = () => {
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').then(() => {
-        console.log('Service Worker Registered')
-      })
-    })
-  }
-}
-
+// Earlier versions of the site registered a caching service worker (/sw.js).
+// Remove it together with its caches for returning visitors.
 export const unregister = () => {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.ready
-      .then(registration => {
-        registration.unregister()
+    navigator.serviceWorker
+      .getRegistrations()
+      .then(registrations => {
+        registrations.forEach(registration => registration.unregister())
       })
+      .catch(error => {
+        console.error(error.message)
+      })
+  }
+
+  if ('caches' in window) {
+    caches
+      .keys()
+      .then(keys => keys.forEach(key => caches.delete(key)))
       .catch(error => {
         console.error(error.message)
       })
